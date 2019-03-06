@@ -1,35 +1,13 @@
-<# 
- .Synopsis
- SCOM Module
+# Create SCOM session. Returns the created PowerShell session object to be used.
+# 
+# Version History
+# ----------------------------
+# 1.0      initial release       HM\LE
+# # # # # # # # # # # # # # # # # # # # # # # # # #
+# Parameter SCOM Server: Name The hostname of the SCOM server.
+# Parameter credential: The credential object used to access the server.
+# Example: Create-PSSession -scomServerName $theServer -credential $userCredential; 
 
- .Description
-  Contains common PowerShell functions for SCOM support
-
- .Author
-  HIGHMETRIC\luis.escobar
-
- Requires -Version 3.0
-#>
-
-<# 
- .Synopsis
-  Create SCOM session.
-
- .Description
-  Returns the created PowerShell session object to be used.
-
- .Parameter SCOM Server Name
-  The hostname of the SCOM server.
-
- .Parameter credential
-  The credential object used to access the server.
-
- .Example
-   # Create a powershell session.
-   Create-PSSession -scomServerName $theServer -credential $userCredential;
-
- Requires -Version 3.0
-#>
 function Create-PSSession {
 	param(
 		[Parameter(Mandatory=$true)] [string]$scomServerName,
