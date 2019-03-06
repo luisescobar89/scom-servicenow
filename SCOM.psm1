@@ -18,7 +18,7 @@
  .Description
   Returns the created PowerShell session object to be used.
 
- .Parameter SCCM Server Name
+ .Parameter SCOM Server Name
   The hostname of the SCOM server.
 
  .Parameter credential
@@ -36,7 +36,7 @@ function Create-PSSession {
 		[Parameter(Mandatory=$true)] $credential
 	);
 
-        SNCLog-ParameterInfo @("Running Create-PSSession", $scomServerName, $credential)
+        #SNCLog-ParameterInfo @("Running Create-PSSession", $scomServerName, $credential)
 
         $session = New-PSSession -ComputerName $scomServerName -ConfigurationName Microsoft.PowerShell -Credential $credential;
 

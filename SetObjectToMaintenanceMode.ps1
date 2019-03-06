@@ -1,12 +1,15 @@
 Param(
     [string]$mmdevice,
-    [string]$mmdurationminutes,
-       [int]$mmcomment,
-    [string]$mmreason
+       [int]$mmdurationminutes,
+    [string]$mmcomment,
+    [string]$mmreason,
+    [string]$computer,
+    $cred
 )
 
 # Import SCOM module
-Import-Module OperationsManager
+$filepath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent 
+Import-Module "$filepath\SCOM" -DisableNameChecking
 
 # Copy the environment variables to their parameters
 if (test-path env:\SNC_collection) {
@@ -16,25 +19,30 @@ if (test-path env:\SNC_collection) {
   $mmreason          = $env:SNC_mmreason
 }
 
-SNCLog-ParameterInfo @("Running SetObjectToMaintenanceMode", $mmdevice)
+#SNCLog-ParameterInfo @("Running SetObjectToMaintenanceMode", $mmdevice, $mmdurationminutes, $mmcomment, $mmreason)
 
 function Set-ObjectToMaintenanceMode() {
-  New-SCOMManagementGroupConnection -computer $computer
+  # Import SCOM module
+  Import-Module OperationsManager
+  # Connect to the Management Server and set working location
+  New-SCOMManagementGroupConnection $computer
+  Set-Location "OperationsManagerMonitoring::"
   
-  $mmdevice = $args[0];
+  $mmdevice          = $args[0];
   $mmdurationminutes = $args[1];
-  $mmcomment = $args[2];
-  $mmreason = $args[3];
+  $mmcomment         = $args[2];
+  $mmreason          = $args[3];
 
   $endTime = ((Get-Date).AddMinutes($mmdurationminutes))
   $instance = Get-SCOMClassInstance -Name $mmdevice
   Start-SCOMMaintenanceMode -Instance $instance -EndTime $endTime -Comment $mmcomment -Reason $mmreason
 }
 
+# Create a powershell session.
 $session = Create-PSSession -scomServerName $computer -credential $cred
 
 try {
-    SNCLog-DebugInfo "`tInvoking Invoke-Command -ScriptBlock `$'{function:Set-ObjectToMaintenanceMode}' -ArgumentList $instance $endTime $mmcomment $mmreason"
+    #SNCLog-DebugInfo "`tInvoking Invoke-Command -ScriptBlock `$'{function:Set-ObjectToMaintenanceMode}' -ArgumentList $instance $endTime $mmcomment $mmreason"
     Invoke-Command -Session $session -ScriptBlock ${function:Set-ObjectToMaintenanceMode} -ArgumentList $instance $endTime $mmcomment $mmreason
 } finally {
     Remove-PSSession -session $session
