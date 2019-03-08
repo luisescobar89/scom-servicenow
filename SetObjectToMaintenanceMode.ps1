@@ -7,14 +7,16 @@ Param(
 )
 
 # Import SCOM module
-$filepath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent 
-Import-Module "$filepath\SCOM" -DisableNameChecking
+Import-Module "$executingScriptDirectory\SCOM" -DisableNameChecking
 
 # Copy the environment variables to their parameters
-if (test-path env:\SNC_collection) {
+if (test-path env:\SNC_scomserver) {
   $scomserver        = $env:SNC_scomserver
   $mmdevice          = $env:SNC_mmdevice
-  $mmdurationminutes = $env:SNC_mmdurantionminutes
+}
+
+if (test-path env:\SNC_mmdurationminutes) {
+  $mmdurationminutes = $env:SNC_mmdurationminutes
   $mmcomment         = $env:SNC_mmcomment
   $mmreason          = $env:SNC_mmreason
 }
@@ -22,6 +24,9 @@ if (test-path env:\SNC_collection) {
 SNCLog-ParameterInfo @("Running SetObjectToMaintenanceMode", $scomserver, $mmdevice, $mmdurationminutes, $mmcomment, $mmreason)
 
 function Set-ObjectToMaintenanceMode() {
+  # Connect to the Management Server and set working location
+  add-pssnapin "Microsoft.EnterpriseManagement.OperationsManager.Client" 
+	Set-Location "OperationsManagerMonitoring::"
 
   $scomserver        = $args[0];
   $mmdevice          = $args[1];
@@ -29,13 +34,9 @@ function Set-ObjectToMaintenanceMode() {
   $mmcomment         = $args[3];
   $mmreason          = $args[4];
   
-  # Import SCOM module
-  Import-Module OperationsManager
-  # Connect to the Management Server and set working location
-  New-SCOMManagementGroupConnection $scomserver 
-
+  New-SCOMManagementGroupConnection $scomserver
   $endTime = ((Get-Date).AddMinutes($mmdurationminutes))
-  $instance = Get-SCOMClassInstance -Name "'$($mmdevice)'"
+  $instance = Get-SCOMClassInstance -Name $mmdevice
   Start-SCOMMaintenanceMode -Instance $instance -EndTime $endTime -Comment $mmcomment -Reason $mmreason
 }
 
