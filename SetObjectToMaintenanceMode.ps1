@@ -24,7 +24,7 @@ if (test-path env:\SNC_mmdurationminutes) {
 SNCLog-ParameterInfo @("Running SetObjectToMaintenanceMode", $scomserver, $mmdevice, $mmdurationminutes, $mmcomment, $mmreason)
 
 function Set-ObjectToMaintenanceMode() {
-  # Connect to the Management Server and set working location
+  # Add SCOM PowerShell snap-ins and set working location
   add-pssnapin "Microsoft.EnterpriseManagement.OperationsManager.Client" 
 	Set-Location "OperationsManagerMonitoring::"
 
