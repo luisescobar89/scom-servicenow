@@ -3,6 +3,7 @@
 # Version History
 # ----------------------------
 # 1.0      initial release       HM\LE
+# 1.0      updated parameters    HM\LE
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Parameter SCOM Server: Name The hostname of the SCOM server.
 # Parameter credential: The credential object used to access the server.
